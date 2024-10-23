@@ -1,74 +1,35 @@
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import MovieList from './MovieList';
-import Filter from './Filter';
+import Filtre from './Filtre';
+import AddMovieForm from './AddMovieForm';
+import MovieDetail from './MovieDetail';
 
 const App = () => {
   const [movies, setMovies] = useState([]);
-  const [titleFilter, setTitleFilter] = useState('');
-  const [ratingFilter, setRatingFilter] = useState('');
-  
-  const [newMovie, setNewMovie] = useState({ title: '', description: '', posterURL: '', rating: '' });
+  const [filterText, setFilterText] = useState('');
+  const [minRating, setMinRating] = useState(0);
 
-  const addMovie = (movie) => {
-    setMovies([...movies, movie]);
+  const addMovie = movie => {
+    setMovies([...movies, { ...movie, id: Date.now().toString() }]);
   };
 
-  const handleAddMovie = (e) => {
-    e.preventDefault();
-    addMovie(newMovie);
-    setNewMovie({ title: '', description: '', posterURL: '', rating: '' }); // Réinitialiser le formulaire
-  };
-
-  const filteredMovies = movies.filter(movie => {
-    const matchesTitle = movie.title.toLowerCase().includes(titleFilter.toLowerCase());
-    const matchesRating = ratingFilter ? movie.rating >= ratingFilter : true;
-    return matchesTitle && matchesRating;
-  });
+  const filteredMovies = movies.filter(movie =>
+    movie.title.toLowerCase().includes(filterText.toLowerCase()) && movie.rating >= minRating
+  );
 
   return (
-    <div className="app">
-      <h1>Mon Application de Cinéma</h1>
-      <Filter
-        titleFilter={titleFilter}
-        ratingFilter={ratingFilter}
-        setTitleFilter={setTitleFilter}
-        setRatingFilter={setRatingFilter}
-      />
-      
-      <form onSubmit={handleAddMovie}>
-        <input
-          type="text"
-          placeholder="Titre"
-          value={newMovie.title}
-          onChange={(e) => setNewMovie({ ...newMovie, title: e.target.value })}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Description"
-          value={newMovie.description}
-          onChange={(e) => setNewMovie({ ...newMovie, description: e.target.value })}
-          required
-        />
-        <input
-          type="text"
-          placeholder="URL du poster"
-          value={newMovie.posterURL}
-          onChange={(e) => setNewMovie({ ...newMovie, posterURL: e.target.value })}
-          required
-        />
-        <input
-          type="number"
-          placeholder="Note"
-          value={newMovie.rating}
-          onChange={(e) => setNewMovie({ ...newMovie, rating: e.target.value })}
-          required
-        />
-        <button type="submit">Ajouter un film</button>
-      </form>
-      
-      <MovieList movies={filteredMovies} />
-    </div>
+    <Router>
+      <div className="app">
+        <h1>Movie App</h1>
+        <AddMovieForm addMovie={addMovie} />
+        <Filtre filterText={filterText} setFilterText={setFilterText} minRating={minRating} setMinRating={setMinRating} />
+        <MovieList movies={filteredMovies} />
+        <Routes>
+          <Route path="/movies/:id" element={<MovieDetail movies={movies} />} />
+        </Routes>
+      </div>
+    </Router>
   );
 };
 

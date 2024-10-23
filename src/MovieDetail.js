@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 const MovieDetail = ({ movies }) => {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const history = useNavigate();
   const movie = movies.find(movie => movie.id === id);
 
   if (!movie) {
@@ -15,7 +15,7 @@ const MovieDetail = ({ movies }) => {
       <h2>{movie.title}</h2>
       <p>{movie.description}</p>
       <iframe src={movie.trailerURL} title="Trailer" allowFullScreen></iframe>
-      <button onClick={() => navigate('/')}>Back to Home</button>
+      <button onClick={() => history.push('/')}>Back to Home</button>
     </div>
   );
 };
